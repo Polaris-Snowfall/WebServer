@@ -1,9 +1,11 @@
+#ifndef __POLLER_H
+#define __POLLER_H
 #include <vector>
 #include <memory>
 #include <map>
 #include <NonCopyable.h>
+#include <sys/epoll.h>
 
-struct epoll_event;
 class Channel;
 
 class Poller : public NonCopyable{
@@ -23,9 +25,11 @@ private:
 
     void update(int operation,std::shared_ptr<Channel> channel);
 
+    static const int initial_nevents;
     int poll_fd_ {};
     EventList eventslist_ {};
     ChannelMap channels_ {};
 };
 
 
+#endif

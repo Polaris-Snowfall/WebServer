@@ -1,5 +1,4 @@
 #include <Channel.h>
-#include <sys/epoll.h>
 
 const uint32_t Channel::nonEvent = 0;
 const uint32_t Channel::readEvent = EPOLLIN | EPOLLPRI;
@@ -38,8 +37,19 @@ const Channel::EventCallback Channel::setErrorCallback(const EventCallback &cb)
 
 void Channel::handleEvent()
 {
-    if(tie_.lock())
+    std::shared_ptr<void> guard;
+    if (tied_)
+    {
+      guard = tie_.lock();
+      if (guard)
+      {
         handleEventWithGuard();
+      }
+    }
+    else
+    {
+      handleEventWithGuard();
+    }
 }
 
 void Channel::handleEventWithGuard()

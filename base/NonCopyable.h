@@ -1,3 +1,5 @@
+#ifndef __NONCOPYABLE_H
+#define __NONCOPYABLE_H
 class NonCopyable{
 public:
     NonCopyable() = default;
@@ -7,3 +9,4 @@ public:
     NonCopyable(NonCopyable&& other) = delete;
     NonCopyable& operator=(NonCopyable&& other) = delete;
 };
+#endif
