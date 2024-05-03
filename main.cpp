@@ -2,7 +2,7 @@
 #include <EventLoop.h>
 #include <sys/socket.h>
 
-int main()
+int main(int argc,void* argv[])
 {
     sockaddr_in servaddr;
     servaddr.sin_family = AF_INET;

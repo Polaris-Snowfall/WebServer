@@ -37,7 +37,7 @@ void Acceptor::listen()
 void Acceptor::accept()
 {
     sockaddr_in cliaddr{};
-    socklen_t cliaddrLen;
+    socklen_t cliaddrLen = sizeof(cliaddr);
     int clifd = ::accept(channel_->fd(),reinterpret_cast<struct sockaddr*>(&cliaddr),&cliaddrLen);
     if(clifd < 0)
     {

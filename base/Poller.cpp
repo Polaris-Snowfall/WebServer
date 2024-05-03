@@ -6,7 +6,7 @@ const int  Poller::initial_nevents = 16;
 
 Poller::Poller() : eventslist_(initial_nevents)
 {
-    LOG_DEBUG << "Poller create";
+    LOG_DEBUG << "Thread " << gettid() << " "<< "Poller create";
     poll_fd_ = epoll_create1(0);
     if(poll_fd_ == -1)
     {
@@ -16,7 +16,7 @@ Poller::Poller() : eventslist_(initial_nevents)
 
 Poller::~Poller()
 {
-    LOG_DEBUG << "Poller destroy";
+    LOG_DEBUG << "Thread " << gettid() << " "<< "Poller destroy";
     int ret = close(poll_fd_);
     if(ret < 0)
         errorExit("~Poller::close");
@@ -24,10 +24,10 @@ Poller::~Poller()
 
 void Poller::poll(int timeoutMs,ChannelList& activeChannels)
 {
-    LOG_INFO << "Poller wait";
+    LOG_INFO << "Thread " << gettid() << " "<< "Poller wait";
     int numEvents = epoll_wait(poll_fd_,eventslist_.data(),
                                 static_cast<int>(eventslist_.size()),timeoutMs);
-    LOG_INFO << "Poller weakup";
+    LOG_INFO << "Thread " << gettid() << " "<< "Poller weakup";
     if (numEvents == -1) 
     {
         if(errno != EINTR)
@@ -37,7 +37,7 @@ void Poller::poll(int timeoutMs,ChannelList& activeChannels)
     // 如果最大events数量等于本次返回事件数量,将其加倍.
     if(numEvents == static_cast<int>(eventslist_.size()))
     {
-        LOG_DEBUG << "Poller resize";
+        LOG_DEBUG << "Thread " << gettid() << " "<<"Poller resize";
         eventslist_.resize(2*eventslist_.size());
     }
     
@@ -55,12 +55,12 @@ void Poller::updateChannel(std::shared_ptr<Channel> channel)
     int operation;
     if(channels_.find(channel->fd()) != channels_.end())
     {
-        LOG_DEBUG << "Poller Mod/Del Channel";
+        LOG_DEBUG << "Thread " << gettid() << " "<< "Poller Mod/Del Channel";
         operation = channel->isNonEvent() ? EPOLL_CTL_DEL : EPOLL_CTL_MOD;
     }
     else
     {
-        LOG_DEBUG << "Poller add Channel";
+        LOG_DEBUG << "Thread " << gettid() << " "<< "Poller add Channel";
         operation = EPOLL_CTL_ADD;
         channels_[channel->fd()] = channel;
     }
